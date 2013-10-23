@@ -13,7 +13,7 @@ public class DisplayQueryResults extends JFrame
    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
    static final String DATABASE_URL = "jdbc:mysql://localhost/hotel";
    static final String USERNAME= "root";
-   																									static final String PASSWORD= "namber913";
+   																									static final String PASSWORD= "password";
    
    // default query retrieves all data from authors table
    static final String DEFAULT_QUERY = "SELECT Room.rmID, Room.roomType, Room.occupied FROM Room, Cost WHERE Room.roomType = Cost.roomType ORDER BY price, rmID ASC;";
