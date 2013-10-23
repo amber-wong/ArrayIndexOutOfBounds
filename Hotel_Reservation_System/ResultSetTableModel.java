@@ -142,15 +142,24 @@ public class ResultSetTableModel extends AbstractTableModel
    } // end method getValueAt
    
    // set new database query string
-   public void setQuery( String query ) 
+   public void setQuery(String query) 
       throws SQLException, IllegalStateException 
    {
       // ensure database connection is available
       if ( !connectedToDatabase ) 
-         throw new IllegalStateException( "Not Connected to Database" );
+         throw new IllegalStateException("Not Connected to Database");
 
       // specify query and execute it
-      resultSet = statement.executeQuery( query );
+      resultSet = statement.executeQuery(query);
+/*
+      statement.executeUpdate(query);
+      resultSet.updateString(statement.executeUpdate(query), query);
+*/
+/*
+int statement1 = statement.executeUpdate(query);
+resultSet = (ResultSet) (String) statement1;
+*/    
+//resultSet = statement.executeUpdate(query);
 
       // obtain meta data for ResultSet
       metaData = resultSet.getMetaData();

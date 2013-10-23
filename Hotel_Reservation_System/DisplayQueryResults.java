@@ -13,7 +13,7 @@ public class DisplayQueryResults extends JFrame
    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
    static final String DATABASE_URL = "jdbc:mysql://localhost/hotel";
    static final String USERNAME= "root";
-   																									static final String PASSWORD= "password";
+   static final String PASSWORD= "password";
    
    // default query retrieves all data from authors table
    static final String DEFAULT_QUERY = "SELECT Room.rmID, Room.roomType, Room.occupied FROM Room, Cost WHERE Room.roomType = Cost.roomType ORDER BY price, rmID ASC;";
@@ -51,6 +51,8 @@ public class DisplayQueryResults extends JFrame
          
          // set up JTextField for hotel information
          hotelInfo = new JLabel("Welcome to the Hotel Reservation System!");
+         hotelInfo.setFont(new Font("Arial", Font.BOLD, 16));
+         hotelInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
          Box hotelInfoBox = Box.createHorizontalBox();
          hotelInfoBox.add(hotelInfo);
          
@@ -60,11 +62,14 @@ public class DisplayQueryResults extends JFrame
          // set up JButton for checking prices
          JButton checkCost = new JButton("Check Hotel Prices");
          
-      // set up JButton for checking reservations
+         // set up JButton for checking reservations
          JButton checkReservation = new JButton("Check Reservations");
          
-      // set up JButton for checking customers
+         // set up JButton for checking customers
          JButton checkCustomers = new JButton("Check Customers");
+         
+         // set up JButton for checking customers
+         JButton newCustomer = new JButton("New Customer");
 
          // create Box to manage placement of queryArea and 
          // submitButton in GUI
@@ -75,6 +80,7 @@ public class DisplayQueryResults extends JFrame
          buttonBox.add(checkCost);
          buttonBox.add(checkReservation);
          buttonBox.add(checkCustomers);
+         buttonBox.add(newCustomer);
 
          // create JTable delegate for tableModel 
          JTable resultTable = new JTable(tableModel);
@@ -128,7 +134,7 @@ public class DisplayQueryResults extends JFrame
 */         
          
          
-      // create event listener for submitButton
+      // create event listener for checkRmAvail
          checkRmAvail.addActionListener(
             new ActionListener() 
             {
@@ -170,7 +176,7 @@ public class DisplayQueryResults extends JFrame
          ); // end call to addActionListener
          
          
-      // create event listener for submitButton
+      // create event listener for checkCost
          checkCost.addActionListener( 
             new ActionListener() 
             {
@@ -211,7 +217,7 @@ public class DisplayQueryResults extends JFrame
             }  // end ActionListener inner class          
          ); // end call to addActionListener
          
-      // create event listener for submitButton
+      // create event listener for checkReservation
          checkReservation.addActionListener( 
             new ActionListener() 
             {
@@ -261,7 +267,7 @@ resID	lastName	cID		checkIn			checkOut		rmID		pay
             }  // end ActionListener inner class          
          ); // end call to addActionListener
          
-      // create event listener for submitButton
+      // create event listener for checkCustomers
          checkCustomers.addActionListener( 
             new ActionListener() 
             {
@@ -305,7 +311,99 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
                } // end actionPerformed
             }  // end ActionListener inner class          
          ); // end call to addActionListener
+         
+      // create event listener for newCustomer
+         newCustomer.addActionListener( 
+            new ActionListener() 
+            {
+               // pass query to table model
+               public void actionPerformed(ActionEvent event)
+               {
+if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+{	
+            	   String customerFirstName = JOptionPane.showInputDialog("What is your first name?", null);
+            	   if (customerFirstName.matches(".*\\d.*"))
+            	   {
+            		   customerFirstName = JOptionPane.showInputDialog("Please enter a valid first name.", null);
+            	   }
+            	   String customerLastName = JOptionPane.showInputDialog("What is your last name?", null);
+            	   if (customerLastName.matches(".*\\d.*"))
+            	   {
+            		   customerLastName = JOptionPane.showInputDialog("Please enter a valid last name.", null);
+            	   }
+            	   String customerAddress = JOptionPane.showInputDialog("What is your primary address of residency?", null);
+            	   if (!customerAddress.matches(".*\\d.*"))
+            	   {
+            		   customerAddress = JOptionPane.showInputDialog("Please enter a valid address.", null);
+            	   }
+            	   String customerCity = JOptionPane.showInputDialog("Which city is your residency located in?", null);
+            	   if (customerCity.matches(".*\\d.*") || customerCity.length() > 20)
+            	   {
+            		   customerCity = JOptionPane.showInputDialog("Please enter a valid city.", null);
+            	   }
+            	   String customerZipCode = JOptionPane.showInputDialog("What is the zip code of your residency? (5 digits)", null);
+            	   if (!customerZipCode.matches("[0-9]*") || customerZipCode.length() != 5)
+            	   {
+            		   customerZipCode = JOptionPane.showInputDialog("Please enter your 5-digit zip code with the following format: #####", null);
+            	   }
+            	   String customerPhoneNum = JOptionPane.showInputDialog("What is your main phone number? (10 digits)", null);
+            	   if (!customerPhoneNum.matches("[0-9]*") || customerPhoneNum.length() != 10)
+            	   {
+            		   customerPhoneNum = JOptionPane.showInputDialog("Please enter your 10-digit phone number with the following format: ##########", null);
+                   }
+            	   String customerCreditCardNum = JOptionPane.showInputDialog("What is your credit card number?", null);
+            	   if (!customerCreditCardNum.matches("[0-9]*") || customerCreditCardNum.length() > 19)
+            	   {
+            		   customerCreditCardNum = JOptionPane.showInputDialog("Please enter a valid credit card number.", null);
+            	   }
+            	   String customerUpdatedAt = "CURDATE()";
 
+                  // perform a new query
+                  try 
+                  {
+                     tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt VALUES(" + customerLastName + "," + customerFirstName + "," + customerAddress + "," + customerCity + "," + customerZipCode + "," + customerPhoneNum + "," + customerCreditCardNum + "," + customerUpdatedAt);
+                  } // end try
+                  catch ( SQLException sqlException ) 
+                  {
+                     JOptionPane.showMessageDialog( null, 
+                        sqlException.getMessage(), "Database error", 
+                        JOptionPane.ERROR_MESSAGE );
+                     
+                     // try to recover from invalid user query 
+                     // by executing default query
+                     try 
+                     {
+                        tableModel.setQuery(DEFAULT_QUERY);
+                        queryArea.setText(DEFAULT_QUERY);
+                     } // end try
+                     catch ( SQLException sqlException2 ) 
+                     {
+                        JOptionPane.showMessageDialog( null, 
+                           sqlException2.getMessage(), "Database error", 
+                           JOptionPane.ERROR_MESSAGE );
+         
+                        // ensure database connection is closed
+                        tableModel.disconnectFromDatabase();
+         
+                        System.exit(1); // terminate application
+                     } // end inner catch                   
+                  } // end outer catch
+}
+               } // end actionPerformed
+            }  // end ActionListener inner class          
+         ); // end call to addActionListener
+
+         
+/*            	   
+   	  String customerID = JOptionPane.showInputDialog("What is your customer ID?", null);
+   	  String customerLastName = JOptionPane.showInputDialog("What is your last name?", null);
+   	  String roomTypeDesired = JOptionPane.showInputDialog("What room type would you like? (Standard, Deluxe, Suite)", null);
+   	  String checkInDate = JOptionPane.showInputDialog("What day would you like to check in? (YYYY-MM-DD)", null);
+   	  String checkOutDate = JOptionPane.showInputDialog("What day would you like to check out? (YYYY-MM-DD)", null);
+*/            	  
+/*
+resID	lastName	cID		checkIn			checkOut		rmID		pay
+*/         
          
          
          setSize(500, 250); // set window size
@@ -344,7 +442,7 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
             public void windowClosed(WindowEvent event)
             {
             	tableModel.disconnectFromDatabase();
-            	System.exit( 0 );
+            	System.exit(0);
             } // end method windowClosed
          } // end WindowAdapter inner class
       ); // end call to addWindowListener
