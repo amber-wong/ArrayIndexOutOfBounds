@@ -142,15 +142,21 @@ public class ResultSetTableModel extends AbstractTableModel
    } // end method getValueAt
    
    // set new database query string
-   public void setQuery(String query) 
-      throws SQLException, IllegalStateException 
+   public void setQuery(String query) throws SQLException, IllegalStateException 
    {
       // ensure database connection is available
       if ( !connectedToDatabase ) 
          throw new IllegalStateException("Not Connected to Database");
-
+      
+      //Temporary approach how to deal with update query
+      if (!query.trim().substring(0, 1).equalsIgnoreCase("s"))
+      {
+    	  statement.executeUpdate(query);
+      }
+      else
+      {
       // specify query and execute it
-      resultSet = statement.executeQuery(query);
+    	  resultSet = statement.executeQuery(query);
 /*
       statement.executeUpdate(query);
       resultSet.updateString(statement.executeUpdate(query), query);
@@ -161,21 +167,23 @@ resultSet = (ResultSet) (String) statement1;
 */    
 //resultSet = statement.executeUpdate(query);
 
-      // obtain meta data for ResultSet
-      metaData = resultSet.getMetaData();
+    	  // obtain meta data for ResultSet
+    	 metaData = resultSet.getMetaData();
 
-      // determine number of rows in ResultSet
-      resultSet.last();                   // move to last row
-      numberOfRows = resultSet.getRow();  // get row number 
+    	 // determine number of rows in ResultSet
+      	resultSet.last();                   // move to last row
+      	numberOfRows = resultSet.getRow();  // get row number 
       
-// Alert the user if an inputted value does not exist in the database.
-	  if (numberOfRows == 0)
-	  {
-		  JOptionPane.showMessageDialog (null, "We're sorry, one or more values does not exist in our system. Please try again.", "Error message", JOptionPane.PLAIN_MESSAGE);
-	  }
+      
+      	// Alert the user if an inputted value does not exist in the database.
+      	if (numberOfRows == 0)
+      	{
+      		JOptionPane.showMessageDialog (null, "We're sorry, one or more values does not exist in our system. Please try again.", "Error message", JOptionPane.PLAIN_MESSAGE);
+      	}
       
       // notify JTable that model has changed
-      fireTableStructureChanged();
+      	fireTableStructureChanged();
+      }
    } // end method setQuery
 
    // close Statement and Connection               

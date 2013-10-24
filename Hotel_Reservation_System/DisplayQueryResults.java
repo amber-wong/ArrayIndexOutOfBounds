@@ -13,11 +13,10 @@ public class DisplayQueryResults extends JFrame
    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
    static final String DATABASE_URL = "jdbc:mysql://localhost/hotel";
    static final String USERNAME= "root";
-   static final String PASSWORD= "password";
+   static final String PASSWORD= "quangnam";
    
    // default query retrieves all data from authors table
    static final String DEFAULT_QUERY = "SELECT Room.rmID, Room.roomType, Room.occupied FROM Room, Cost WHERE Room.roomType = Cost.roomType ORDER BY price, rmID ASC;";
-   
    private ResultSetTableModel tableModel;
    private JTextArea queryArea;
    private JLabel hotelInfo;
@@ -356,12 +355,12 @@ if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JO
             	   {
             		   customerCreditCardNum = JOptionPane.showInputDialog("Please enter a valid credit card number.", null);
             	   }
-            	   String customerUpdatedAt = "CURDATE()";
+            	   String customerUpdatedAt = "NOW()";
 
                   // perform a new query
                   try 
                   {
-                     tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt VALUES(" + customerLastName + "," + customerFirstName + "," + customerAddress + "," + customerCity + "," + customerZipCode + "," + customerPhoneNum + "," + customerCreditCardNum + "," + customerUpdatedAt);
+                     tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt) VALUES(" + "'" + customerLastName + "'" + "," + "'" + customerFirstName + "'" + "," + "'" + customerAddress + "'" + "," + "'" + customerCity + "'" + "," + "'" + customerZipCode + "'" + "," + "'" + customerPhoneNum + "'" + "," + "'" + customerCreditCardNum + "'" + "," + customerUpdatedAt + ")");
                   } // end try
                   catch ( SQLException sqlException ) 
                   {
