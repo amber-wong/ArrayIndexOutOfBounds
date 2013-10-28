@@ -13,8 +13,8 @@ public class DisplayQueryResults extends JFrame
    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
    static final String DATABASE_URL = "jdbc:mysql://localhost/hotel";
    static final String USERNAME= "root";
-   static final String PASSWORD= "yourpassword"; //Need to be changed before running!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   
+   static final String PASSWORD= "password";
+
    // default query retrieves all data from authors table
    static final String DEFAULT_QUERY = "SELECT Room.rmID, Room.roomType, Room.occupied FROM Room, Cost WHERE Room.roomType = Cost.roomType ORDER BY price, rmID ASC;";
    private ResultSetTableModel tableModel;
@@ -68,7 +68,7 @@ public class DisplayQueryResults extends JFrame
          JButton checkCustomers = new JButton("Check Customers");
          
          // set up JButton for checking customers
-         JButton newCustomer = new JButton("New Customer");
+         JButton newReservation = new JButton("Place Reservation");
 
          // create Box to manage placement of queryArea and 
          // submitButton in GUI
@@ -79,7 +79,7 @@ public class DisplayQueryResults extends JFrame
          buttonBox.add(checkCost);
          buttonBox.add(checkReservation);
          buttonBox.add(checkCustomers);
-         buttonBox.add(newCustomer);
+         buttonBox.add(newReservation);
 
          // create JTable delegate for tableModel 
          JTable resultTable = new JTable(tableModel);
@@ -108,8 +108,7 @@ public class DisplayQueryResults extends JFrame
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE);
                      
-                     // try to recover from invalid user query 
-                     // by executing default query
+                     // try to recover from invalid user query by executing default query
                      try 
                      {
                         tableModel.setQuery(DEFAULT_QUERY);
@@ -151,8 +150,7 @@ public class DisplayQueryResults extends JFrame
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
                      
-                     // try to recover from invalid user query 
-                     // by executing default query
+                     // try to recover from invalid user query by executing default query
                      try 
                      {
                         tableModel.setQuery(DEFAULT_QUERY);
@@ -193,8 +191,7 @@ public class DisplayQueryResults extends JFrame
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
                      
-                     // try to recover from invalid user query 
-                     // by executing default query
+                     // try to recover from invalid user query by executing default query
                      try 
                      {
                         tableModel.setQuery(DEFAULT_QUERY);
@@ -243,8 +240,7 @@ resID	lastName	cID		checkIn			checkOut		rmID		pay
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
                      
-                     // try to recover from invalid user query 
-                     // by executing default query
+                     // try to recover from invalid user query by executing default query
                      try 
                      {
                         tableModel.setQuery(DEFAULT_QUERY);
@@ -288,8 +284,7 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
                      
-                     // try to recover from invalid user query 
-                     // by executing default query
+                     // try to recover from invalid user query by executing default query
                      try 
                      {
                         tableModel.setQuery(DEFAULT_QUERY);
@@ -311,8 +306,8 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
             }  // end ActionListener inner class          
          ); // end call to addActionListener
          
-      // create event listener for newCustomer
-         newCustomer.addActionListener( 
+      // create event listener for newReservation
+         newReservation.addActionListener( 
             new ActionListener() 
             {
                // pass query to table model
@@ -325,42 +320,53 @@ if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JO
             	   {
             		   customerFirstName = JOptionPane.showInputDialog("Please enter a valid first name.", null);
             	   }
+            	   
             	   String customerLastName = JOptionPane.showInputDialog("What is your last name?", null);
             	   if (customerLastName.matches(".*\\d.*"))
             	   {
             		   customerLastName = JOptionPane.showInputDialog("Please enter a valid last name.", null);
             	   }
+            	   
             	   String customerAddress = JOptionPane.showInputDialog("What is your primary address of residency?", null);
             	   if (!customerAddress.matches(".*\\d.*"))
             	   {
             		   customerAddress = JOptionPane.showInputDialog("Please enter a valid address.", null);
             	   }
+            	   
             	   String customerCity = JOptionPane.showInputDialog("Which city is your residency located in?", null);
             	   if (customerCity.matches(".*\\d.*") || customerCity.length() > 20)
             	   {
             		   customerCity = JOptionPane.showInputDialog("Please enter a valid city.", null);
             	   }
+            	   
             	   String customerZipCode = JOptionPane.showInputDialog("What is the zip code of your residency? (5 digits)", null);
             	   if (!customerZipCode.matches("[0-9]*") || customerZipCode.length() != 5)
             	   {
             		   customerZipCode = JOptionPane.showInputDialog("Please enter your 5-digit zip code with the following format: #####", null);
             	   }
+            	   
             	   String customerPhoneNum = JOptionPane.showInputDialog("What is your main phone number? (10 digits)", null);
             	   if (!customerPhoneNum.matches("[0-9]*") || customerPhoneNum.length() != 10)
             	   {
             		   customerPhoneNum = JOptionPane.showInputDialog("Please enter your 10-digit phone number with the following format: ##########", null);
                    }
+            	   
             	   String customerCreditCardNum = JOptionPane.showInputDialog("What is your credit card number?", null);
             	   if (!customerCreditCardNum.matches("[0-9]*") || customerCreditCardNum.length() > 19)
             	   {
             		   customerCreditCardNum = JOptionPane.showInputDialog("Please enter a valid credit card number.", null);
             	   }
+            	   
             	   String customerUpdatedAt = "NOW()";
 
                   // perform a new query
                   try 
                   {
                      tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt) VALUES(" + "'" + customerLastName + "'" + "," + "'" + customerFirstName + "'" + "," + "'" + customerAddress + "'" + "," + "'" + customerCity + "'" + "," + "'" + customerZipCode + "'" + "," + "'" + customerPhoneNum + "'" + "," + "'" + customerCreditCardNum + "'" + "," + customerUpdatedAt + ")");
+Statement tempStatement = null;
+@SuppressWarnings("null")
+ResultSet tempCustomerID = tempStatement.executeQuery("SELECT cID FROM Customer");
+System.out.println("Your Customer ID is" + tempCustomerID);
                   } // end try
                   catch ( SQLException sqlException ) 
                   {
@@ -368,8 +374,7 @@ if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JO
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
                      
-                     // try to recover from invalid user query 
-                     // by executing default query
+                     // try to recover from invalid user query by executing default query
                      try 
                      {
                         tableModel.setQuery(DEFAULT_QUERY);
@@ -388,21 +393,136 @@ if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JO
                      } // end inner catch                   
                   } // end outer catch
 }
-               } // end actionPerformed
-            }  // end ActionListener inner class          
-         ); // end call to addActionListener
-
-         
-/*            	   
-   	  String customerID = JOptionPane.showInputDialog("What is your customer ID?", null);
-   	  String customerLastName = JOptionPane.showInputDialog("What is your last name?", null);
-   	  String roomTypeDesired = JOptionPane.showInputDialog("What room type would you like? (Standard, Deluxe, Suite)", null);
-   	  String checkInDate = JOptionPane.showInputDialog("What day would you like to check in? (YYYY-MM-DD)", null);
-   	  String checkOutDate = JOptionPane.showInputDialog("What day would you like to check out? (YYYY-MM-DD)", null);
-*/            	  
+         	  
 /*
 resID	lastName	cID		checkIn			checkOut		rmID		pay
-*/         
+*/
+
+
+
+
+String customerID = JOptionPane.showInputDialog("What is your customer ID?", null);
+String reservationLastName = JOptionPane.showInputDialog("What is your last name?", null);
+// BEGIN test that the user exists in Customer
+try {
+tableModel.setQuery("SELECT cID, lastName FROM Customer WHERE cID = '" + customerID + "' and lastName = '" + reservationLastName + "';");
+}
+catch ( SQLException sqlException2 ) 
+{
+   JOptionPane.showMessageDialog( null, 
+      sqlException2.getMessage(), "Database error", 
+      JOptionPane.ERROR_MESSAGE );
+
+   // ensure database connection is closed
+   tableModel.disconnectFromDatabase();
+
+   System.exit(1); // terminate application
+}
+// END test that user exists in Customer
+
+
+String roomTypeDesired = JOptionPane.showInputDialog("What room type would you like? (Standard, Deluxe, Suite)", null);
+String checkInDate = JOptionPane.showInputDialog("What day would you like to check in? (YYYY-MM-DD)", null);
+String checkOutDate = JOptionPane.showInputDialog("What day would you like to check out? (YYYY-MM-DD)", null);
+// BEGIN test that smallest roomID for desired room type is chosen
+try {
+	tableModel.setQuery("SELECT MIN(Room.rmID), Room.roomType, price FROM Room, Cost WHERE Room.roomType = Cost.roomType and Room.roomType = '" + roomTypeDesired + "' and occupied = false;");
+}
+catch ( SQLException sqlException2 ) 
+{
+   JOptionPane.showMessageDialog( null, 
+      sqlException2.getMessage(), "Database error", 
+      JOptionPane.ERROR_MESSAGE );
+
+   // ensure database connection is closed
+   tableModel.disconnectFromDatabase();
+
+   System.exit(1); // terminate application
+}
+// END test that smallest roomID for desired room type is chosen
+
+
+// dialogue to confirm placing reservation
+if (JOptionPane.showConfirmDialog(null, "Place reservation?", "Request", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+{	
+System.out.println("User has chosen to place reservation.");
+System.out.println("Entering final try-catch block");
+                  // perform a new query
+                  try 
+                  {
+System.out.println("Entered TRY of final try-catch block");
+
+// Get integer value of customer.
+int intCustomerID = Integer.parseInt(customerID);
+
+Statement tempStatement = null;
+@SuppressWarnings("null")
+
+// Get integer value of room ID.
+ResultSet reservationRmID = tempStatement.executeQuery("SELECT MIN(rmID) FROM Room WHERE roomType = '" + roomTypeDesired + "';");
+int intReservationRmID = reservationRmID.getInt("MIN(rmID)");
+System.out.println("Successfully passed through ResultSet reservationRmID");
+
+// Get integer value of room price.
+ResultSet reservationPay = tempStatement.executeQuery("SELECT price FROM Cost WHERE roomType = '" + roomTypeDesired + "';");
+int intReservationPay = reservationPay.getInt("price");
+System.out.println("Successfully passed through ResultSet reservationPay");
+
+// Insert the data into Reservation.
+tableModel.setQuery("INSERT INTO Reservation(cID, checkIn, checkOut, rmID, pay) VALUES(" + intCustomerID + ",'" + checkInDate + "','" + checkOutDate + "'," + intReservationRmID + "," + intReservationPay + ")");
+                  } // end try
+                  catch ( SQLException sqlException ) 
+                  {
+System.out.println("Entered CATCH of final try-catch block");
+                     JOptionPane.showMessageDialog( null, 
+                        sqlException.getMessage(), "Database error", 
+                        JOptionPane.ERROR_MESSAGE );
+                     
+                     // try to recover from invalid user query by executing default query
+                     try 
+                     {
+                        tableModel.setQuery(DEFAULT_QUERY);
+                        queryArea.setText(DEFAULT_QUERY);
+                     } // end try
+                     catch ( SQLException sqlException2 ) 
+                     {
+                        JOptionPane.showMessageDialog( null, 
+                           sqlException2.getMessage(), "Database error", 
+                           JOptionPane.ERROR_MESSAGE );
+         
+                        // ensure database connection is closed
+                        tableModel.disconnectFromDatabase();
+         
+                        System.exit(1); // terminate application
+                     } // end inner catch                   
+                  } // end outer catch
+}
+else
+{
+System.out.println("User has chosen not to place reservation.");
+	try 
+    {
+       tableModel.setQuery(DEFAULT_QUERY);
+       queryArea.setText(DEFAULT_QUERY);
+    } // end try
+    catch ( SQLException sqlException2 ) 
+    {
+       JOptionPane.showMessageDialog( null, 
+          sqlException2.getMessage(), "Database error", 
+          JOptionPane.ERROR_MESSAGE );
+
+       // ensure database connection is closed
+       tableModel.disconnectFromDatabase();
+
+       System.exit(1); // terminate application
+    }
+}
+                  
+
+
+               } // end actionPerformed
+            }  // end ActionListener inner class          
+         ); // end call to addActionListener     
          
          
          setSize(500, 250); // set window size
@@ -470,3 +590,4 @@ resID	lastName	cID		checkIn			checkOut		rmID		pay
  * consequential damages in connection with, or arising out of, the       *
  * furnishing, performance, or use of these programs.                     *
  *************************************************************************/
+   
