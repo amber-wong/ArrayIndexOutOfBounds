@@ -61,11 +61,14 @@ public class DisplayQueryResults extends JFrame
          // set up JButton for checking prices
          JButton checkCost = new JButton("Check Hotel Prices");
          
+         // set up JButton for checking customers
+         JButton checkCustomers = new JButton("Check Customers");
+         
          // set up JButton for checking reservations
          JButton checkReservation = new JButton("Check Reservations");
          
-         // set up JButton for checking customers
-         JButton checkCustomers = new JButton("Check Customers");
+         // set up JButton for adding customer
+         JButton newCustomer = new JButton("New Customer");
          
          // set up JButton for checking customers
          JButton newReservation = new JButton("Place Reservation");
@@ -78,8 +81,10 @@ public class DisplayQueryResults extends JFrame
          buttonBox.add(checkRmAvail);
          buttonBox.add(checkCost);
          buttonBox.add(checkReservation);
-         buttonBox.add(checkCustomers);
+         buttonBox.add(newCustomer);
          buttonBox.add(newReservation);
+         
+         buttonBox.add(checkCustomers); // for testing purposes
 
          // create JTable delegate for tableModel 
          JTable resultTable = new JTable(tableModel);
@@ -236,6 +241,7 @@ resID	lastName	cID		checkIn			checkOut		rmID		pay
                   } // end try
                   catch ( SQLException sqlException ) 
                   {
+                	 System.out.println("User has chosen not to check reservations.");
                      JOptionPane.showMessageDialog( null, 
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
@@ -306,7 +312,139 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
             }  // end ActionListener inner class          
          ); // end call to addActionListener
          
-      // create event listener for newReservation
+         
+         
+         
+         
+         
+         
+         // create event listener for newCustomer
+         newCustomer.addActionListener( 
+                 new ActionListener() 
+                 {
+                    // pass query to table model
+                    public void actionPerformed(ActionEvent event)
+                    {
+     if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+     {	
+                 	   String customerFirstName = JOptionPane.showInputDialog("What is your first name?", null);
+                 	   if (customerFirstName.matches(".*\\d.*"))
+                 	   {
+                 		   customerFirstName = JOptionPane.showInputDialog("Please enter a valid first name.", null);
+                 	   }
+                 	   
+                 	   String customerLastName = JOptionPane.showInputDialog("What is your last name?", null);
+                 	   if (customerLastName.matches(".*\\d.*"))
+                 	   {
+                 		   customerLastName = JOptionPane.showInputDialog("Please enter a valid last name.", null);
+                 	   }
+                 	   
+                 	   String customerAddress = JOptionPane.showInputDialog("What is your primary address of residency?", null);
+                 	   if (!customerAddress.matches(".*\\d.*"))
+                 	   {
+                 		   customerAddress = JOptionPane.showInputDialog("Please enter a valid address.", null);
+                 	   }
+                 	   
+                 	   String customerCity = JOptionPane.showInputDialog("Which city is your residency located in?", null);
+                 	   if (customerCity.matches(".*\\d.*") || customerCity.length() > 20)
+                 	   {
+                 		   customerCity = JOptionPane.showInputDialog("Please enter a valid city.", null);
+                 	   }
+                 	   
+                 	   String customerZipCode = JOptionPane.showInputDialog("What is the zip code of your residency? (5 digits)", null);
+                 	   if (!customerZipCode.matches("[0-9]*") || customerZipCode.length() != 5)
+                 	   {
+                 		   customerZipCode = JOptionPane.showInputDialog("Please enter your 5-digit zip code with the following format: #####", null);
+                 	   }
+                 	   
+                 	   String customerPhoneNum = JOptionPane.showInputDialog("What is your main phone number? (10 digits)", null);
+                 	   if (!customerPhoneNum.matches("[0-9]*") || customerPhoneNum.length() != 10)
+                 	   {
+                 		   customerPhoneNum = JOptionPane.showInputDialog("Please enter your 10-digit phone number with the following format: ##########", null);
+                        }
+                 	   
+                 	   String customerCreditCardNum = JOptionPane.showInputDialog("What is your credit card number?", null);
+                 	   if (!customerCreditCardNum.matches("[0-9]*") || customerCreditCardNum.length() > 19)
+                 	   {
+                 		   customerCreditCardNum = JOptionPane.showInputDialog("Please enter a valid credit card number.", null);
+                 	   }
+                 	   
+                 	   String customerUpdatedAt = "NOW()";
+
+                       // perform a new query
+                       try 
+                       {
+                          tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt) VALUES(" + "'" + customerLastName + "'" + "," + "'" + customerFirstName + "'" + "," + "'" + customerAddress + "'" + "," + "'" + customerCity + "'" + "," + "'" + customerZipCode + "'" + "," + "'" + customerPhoneNum + "'" + "," + "'" + customerCreditCardNum + "'" + "," + customerUpdatedAt + ")");
+
+/*                          
+     Statement tempStatement = null;
+     System.out.println("Entering ResultSet tempCustomerID");
+     @SuppressWarnings("null")
+     ResultSet tempCustomerID = tempStatement.executeQuery("SELECT cID FROM Customer WHERE lastName = '" + customerLastName + "' and firstName = '" + customerFirstName + "';");
+     System.out.println("Your Customer ID is" + tempCustomerID);
+*/
+                          System.out.println("Customer has been entered into the system.");
+                          tableModel.setQuery("SELECT * FROM Customer WHERE lastName = '" + customerLastName + "' and firstName = '" + customerFirstName + "';");
+
+                       } // end try
+                       catch ( SQLException sqlException ) 
+                       {
+                          JOptionPane.showMessageDialog( null, 
+                             sqlException.getMessage(), "Database error", 
+                             JOptionPane.ERROR_MESSAGE );
+                          
+                          // try to recover from invalid user query by executing default query
+                          try 
+                          {
+                             tableModel.setQuery(DEFAULT_QUERY);
+                             queryArea.setText(DEFAULT_QUERY);
+                          } // end try
+                          catch ( SQLException sqlException2 ) 
+                          {
+                             JOptionPane.showMessageDialog( null, 
+                                sqlException2.getMessage(), "Database error", 
+                                JOptionPane.ERROR_MESSAGE );
+              
+                             // ensure database connection is closed
+                             tableModel.disconnectFromDatabase();
+              
+                             System.exit(1); // terminate application
+                          } // end inner catch                   
+                       } // end outer catch
+     }
+              	  
+                    
+                    else
+                    {
+                    System.out.println("User is not a new customer.");
+                    	try 
+                        {
+                           tableModel.setQuery(DEFAULT_QUERY);
+                           queryArea.setText(DEFAULT_QUERY);
+                        } // end try
+                        catch ( SQLException sqlException2 ) 
+                        {
+                           JOptionPane.showMessageDialog( null, 
+                              sqlException2.getMessage(), "Database error", 
+                              JOptionPane.ERROR_MESSAGE );
+
+                           // ensure database connection is closed
+                           tableModel.disconnectFromDatabase();
+
+                           System.exit(1); // terminate application
+                        }
+                    }
+
+
+                    } // end actionPerformed
+                 }  // end ActionListener inner class          
+              ); // end call to addActionListener     
+         
+         
+         
+         
+         
+         // create event listener for newReservation
          newReservation.addActionListener( 
             new ActionListener() 
             {
@@ -314,7 +452,8 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
                public void actionPerformed(ActionEvent event)
                {
 if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-{	
+{
+/*	
             	   String customerFirstName = JOptionPane.showInputDialog("What is your first name?", null);
             	   if (customerFirstName.matches(".*\\d.*"))
             	   {
@@ -356,17 +495,22 @@ if (JOptionPane.showConfirmDialog(null, "Are you a new customer?", "Request", JO
             	   {
             		   customerCreditCardNum = JOptionPane.showInputDialog("Please enter a valid credit card number.", null);
             	   }
-            	   
+            	               	   
             	   String customerUpdatedAt = "NOW()";
-
+	
                   // perform a new query
                   try 
                   {
                      tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt) VALUES(" + "'" + customerLastName + "'" + "," + "'" + customerFirstName + "'" + "," + "'" + customerAddress + "'" + "," + "'" + customerCity + "'" + "," + "'" + customerZipCode + "'" + "," + "'" + customerPhoneNum + "'" + "," + "'" + customerCreditCardNum + "'" + "," + customerUpdatedAt + ")");
+
+                     
 Statement tempStatement = null;
+System.out.println("Entering ResultSet tempCustomerID");
 @SuppressWarnings("null")
-ResultSet tempCustomerID = tempStatement.executeQuery("SELECT cID FROM Customer");
+ResultSet tempCustomerID = tempStatement.executeQuery("SELECT cID FROM Customer WHERE lastName = '" + customerLastName + "' and firstName = '" + customerFirstName + "';");
 System.out.println("Your Customer ID is" + tempCustomerID);
+
+
                   } // end try
                   catch ( SQLException sqlException ) 
                   {
@@ -392,20 +536,38 @@ System.out.println("Your Customer ID is" + tempCustomerID);
                         System.exit(1); // terminate application
                      } // end inner catch                   
                   } // end outer catch
+*/
+	System.out.println("Please click 'New Customer' button to add yourself to the system");
+	try 
+    {
+       tableModel.setQuery(DEFAULT_QUERY);
+       queryArea.setText(DEFAULT_QUERY);
+    } // end try
+    catch ( SQLException sqlException2 ) 
+    {
+       JOptionPane.showMessageDialog( null, 
+          sqlException2.getMessage(), "Database error", 
+          JOptionPane.ERROR_MESSAGE );
+
+       // ensure database connection is closed
+       tableModel.disconnectFromDatabase();
+
+       System.exit(1); // terminate application
+    }
 }
          	  
 /*
 resID	lastName	cID		checkIn			checkOut		rmID		pay
 */
 
-
-
+else
+{
 
 String customerID = JOptionPane.showInputDialog("What is your customer ID?", null);
 String reservationLastName = JOptionPane.showInputDialog("What is your last name?", null);
 // BEGIN test that the user exists in Customer
 try {
-tableModel.setQuery("SELECT cID, lastName FROM Customer WHERE cID = '" + customerID + "' and lastName = '" + reservationLastName + "';");
+tableModel.setQuery("SELECT * FROM Customer WHERE cID = '" + customerID + "' and lastName = '" + reservationLastName + "';");
 }
 catch ( SQLException sqlException2 ) 
 {
@@ -473,7 +635,7 @@ tableModel.setQuery("INSERT INTO Reservation(cID, checkIn, checkOut, rmID, pay) 
                   } // end try
                   catch ( SQLException sqlException ) 
                   {
-System.out.println("Entered CATCH of final try-catch block");
+System.out.println("Reservation: Entered CATCH of final try-catch block");
                      JOptionPane.showMessageDialog( null, 
                         sqlException.getMessage(), "Database error", 
                         JOptionPane.ERROR_MESSAGE );
@@ -517,7 +679,7 @@ System.out.println("User has chosen not to place reservation.");
        System.exit(1); // terminate application
     }
 }
-                  
+}                  
 
 
                } // end actionPerformed
