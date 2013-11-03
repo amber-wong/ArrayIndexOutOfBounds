@@ -73,9 +73,10 @@ public class DisplayQueryResults extends JFrame {
 			JButton checkReservation = new JButton("Check Reservations"); // set up JButton for checking reservations
 			JButton newReservation = new JButton("Place Reservation"); // set up JButton for checking customers
 			JButton newCustomer = new JButton("New Customer"); // set up JButton for adding customer
+			JButton updateCustomer = new JButton("Update Information"); // set up JButton for updating customer information
 			
 			// for administrator
-			JButton addRooms = new JButton("Add room");	// set up JButton for adding new rooms
+			JButton addRooms = new JButton("Add Room");	// set up JButton for adding new rooms
 			JButton checkCustomers = new JButton("Check Customers"); // set up JButton for checking customers
 			
 			// set up button panels
@@ -108,7 +109,6 @@ public class DisplayQueryResults extends JFrame {
 					} // end catch                   
 				}
 			} ) );
-			
 			mainPanel.add(new JButton(new AbstractAction("Administrator") {
 				public void actionPerformed(ActionEvent event) {
 					add(adminPanel);
@@ -140,6 +140,7 @@ public class DisplayQueryResults extends JFrame {
 			userPanel.add(checkCost);
 			userPanel.add(checkReservation);
 			userPanel.add(newCustomer);
+			userPanel.add(updateCustomer);
 			userPanel.add(newReservation);
 			userPanel.add(new JButton(new AbstractAction("Back") {
 				public void actionPerformed(ActionEvent event) {
@@ -202,7 +203,6 @@ public class DisplayQueryResults extends JFrame {
 			add(new JScrollPane(resultTable), BorderLayout.SOUTH);
 
 			
-
 			// create event listener for checkRmAvail
 			checkRmAvail.addActionListener(
 				new ActionListener() {
@@ -233,9 +233,7 @@ public class DisplayQueryResults extends JFrame {
 					} // end actionPerformed
 				}  // end ActionListener inner class
 			); // end call to addActionListener
-         
-         
-			
+                  			
 			// create event listener for checkCost
 			checkCost.addActionListener(
 				new ActionListener() {
@@ -265,9 +263,7 @@ public class DisplayQueryResults extends JFrame {
 					} // end actionPerformed
 				}  // end ActionListener inner class    
 			); // end call to addActionListener
-			
-			
-			
+									
 			// create event listener for checkReservation
 			checkReservation.addActionListener( 
 				new ActionListener() {
@@ -338,9 +334,7 @@ resID	cID		lastName	creditCardNum		checkIn			checkOut		rmID		pay
 					} // end actionPerformed
 				}  // end ActionListener inner class          
 			); // end call to addActionListener
-         
-			
-			
+         				
 			// create event listener for newCustomer
 			newCustomer.addActionListener(
 				new ActionListener() {
@@ -386,7 +380,7 @@ resID	cID		lastName	creditCardNum		checkIn			checkOut		rmID		pay
 							
 							// perform a new query
 							try {
-								tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt) VALUES(" + "'" + customerLastName + "'" + "," + "'" + customerFirstName + "'" + "," + "'" + customerAddress + "'" + "," + "'" + customerCity + "'" + "," + "'" + customerZipCode + "'" + "," + "'" + customerPhoneNum + "'" + "," + "'" + customerCreditCardNum + "'" + "," + customerUpdatedAt + ")");
+								tableModel.setQuery("INSERT INTO Customer(lastName, firstName, address, city, zipCode, phoneNum, creditCardNum, updatedAt) VALUES('" + customerLastName + "', '" + customerFirstName + "', '" + customerAddress + "', '" + customerCity + "', '" + customerZipCode + "', '" + customerPhoneNum + "', '" + customerCreditCardNum + "', " + customerUpdatedAt + ")");
 								
 								System.out.println("Customer has been entered into the system.");
 								tableModel.setQuery("SELECT * FROM Customer WHERE lastName = '" + customerLastName + "' and firstName = '" + customerFirstName + "';");
@@ -426,10 +420,96 @@ resID	cID		lastName	creditCardNum		checkIn			checkOut		rmID		pay
 						}
 					} // end actionPerformed
 				}  // end ActionListener inner class
-			); // end call to addActionListener     
-         
-         
-         
+			); // end call to addActionListener    
+			
+			// create event listener for newCustomer
+			updateCustomer.addActionListener(
+				new ActionListener() {
+					// pass query to table model
+					public void actionPerformed(ActionEvent event) {
+						JTextField field1 = new JTextField(2), field2 = new JTextField(2), field3 = new JTextField(2),
+								field4 = new JTextField(2), field5 = new JTextField(2), field6 = new JTextField(2),
+								field7 = new JTextField(2), field8 = new JTextField(2);
+						JPanel fillablePanel = new JPanel();
+						fillablePanel.setLayout(new BoxLayout(fillablePanel, BoxLayout.Y_AXIS));
+						fillablePanel.add(new JLabel("Customer ID:"));
+						fillablePanel.add(field1);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("First Name:"));
+						fillablePanel.add(field2);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("Last Name:"));
+						fillablePanel.add(field3);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("Address:"));
+						fillablePanel.add(field4);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("City:"));
+						fillablePanel.add(field5);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("Zip Code:"));
+						fillablePanel.add(field6);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("Phone Number (##########):"));
+						fillablePanel.add(field7);
+						fillablePanel.add(Box.createHorizontalStrut(2));
+						fillablePanel.add(new JLabel("Credit Card Number (################):"));
+						fillablePanel.add(field8);
+			                		
+						int result = JOptionPane.showConfirmDialog(null, fillablePanel, "Please enter the following:", JOptionPane.OK_CANCEL_OPTION);
+						
+						if (result == JOptionPane.YES_OPTION) {
+							String customerID = field1.getText();
+							String customerFirstName = field2.getText();
+							String customerLastName = field3.getText();
+							String customerAddress = field4.getText();
+							String customerCity = field5.getText();
+							String customerZipCode = field6.getText();
+							String customerPhoneNum = field7.getText();
+							String customerCreditCardNum = field8.getText();
+							String customerUpdatedAt = "NOW()";
+							
+							// perform a new query
+							try {
+								tableModel.setQuery("UPDATE Customer SET lastName = '" + customerLastName + "', firstName = '" + customerFirstName + "' , address = '" + customerAddress + "', city = '" + customerCity + "', zipCode = '" + customerZipCode + "', phoneNum = '" + customerPhoneNum + "', creditCardNum = '" + customerCreditCardNum + "', updatedAt = " + customerUpdatedAt + " WHERE cID = '" + customerID + "' and firstName = '" + customerFirstName + "' and lastName = '" + customerLastName + "' and creditCardNum = '" + customerCreditCardNum + "';");
+								
+								tableModel.setQuery("SELECT * FROM Customer WHERE lastName = '" + customerLastName + "' and firstName = '" + customerFirstName + "';");
+							} // end try
+							catch (SQLException sqlException) {
+								JOptionPane.showMessageDialog(null, sqlException.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE );
+			                       
+								// try to recover from invalid user query by executing default query
+								try {
+									tableModel.setQuery(DEFAULT_QUERY);
+									queryArea.setText(DEFAULT_QUERY);
+								} // end try
+								catch (SQLException sqlException2) {
+									JOptionPane.showMessageDialog(null, sqlException2.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
+			           
+									// ensure database connection is closed
+									tableModel.disconnectFromDatabase();
+			           
+									System.exit(1); // terminate application
+								} // end inner catch                   
+							} // end outer catch
+						}
+						else {
+							System.out.println("Customer information has not been updated in the system.");
+							try {
+								tableModel.setQuery(DEFAULT_QUERY);
+								queryArea.setText(DEFAULT_QUERY);
+							} // end try
+							catch (SQLException sqlException2) {
+								JOptionPane.showMessageDialog(null, sqlException2.getMessage(), "Database error", JOptionPane.ERROR_MESSAGE);
+									// ensure database connection is closed
+								tableModel.disconnectFromDatabase();
+									System.exit(1); // terminate application
+							}
+						}
+					} // end actionPerformed
+				}  // end ActionListener inner class
+			); // end call to addActionListener  
+                          
 			// create event listener for newReservation
 			newReservation.addActionListener(
 				new ActionListener() {
@@ -588,7 +668,6 @@ String storedProc =
 				}  // end ActionListener inner class
 			); // end call to addActionListener    
          
-         
 			
 			// create event listener for checkCustomers
 			checkCustomers.addActionListener(
@@ -622,7 +701,6 @@ cID		lastName	firstName	address					city		zipCode		phoneNum		creditCardNum			upd
 					} // end actionPerformed
 				}  // end ActionListener inner class          
 			); // end call to addActionListener
-			
 			
 			// create event listener for addRooms
 			addRooms.addActionListener(
